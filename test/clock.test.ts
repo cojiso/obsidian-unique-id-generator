@@ -24,7 +24,9 @@ test('keeps increasing when the system time goes back', () => {
 
 test('tracks seconds and milliseconds separately', () => {
 	const clock = fakeClock(1_000)
-	expect([clock.next('ms'), clock.next('ms'), clock.next('s')]).toEqual([
-		1000, 1001, 1,
-	])
+	expect([
+		clock.next('millisecond'),
+		clock.next('millisecond'),
+		clock.next('second'),
+	]).toEqual([1000, 1001, 1])
 })

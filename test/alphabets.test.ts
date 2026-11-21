@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { ALPHABETS, isSingleCase, resolveAlphabet } from '../src/alphabets'
+import { ALPHABETS, checkAlphabet } from '../src/alphabets'
 
 test('each named alphabet has 32 distinct characters', () => {
 	for (const alphabet of Object.values(ALPHABETS)) {
@@ -7,23 +7,16 @@ test('each named alphabet has 32 distinct characters', () => {
 	}
 })
 
-test('resolves names and passes other strings through', () => {
-	expect(resolveAlphabet('bech32')).toBe(ALPHABETS.bech32)
-	expect(resolveAlphabet('abc')).toBe('abc')
+test('passes a valid alphabet through as it is', () => {
+	expect(checkAlphabet('abc')).toBe('abc')
+	expect(checkAlphabet('aAbB')).toBe('aAbB')
 })
 
-test('does not treat inherited property names as alphabet names', () => {
-	expect(resolveAlphabet('valueOf')).toBe('valueOf')
+test('does not read names, so a mistyped name is just characters', () => {
+	expect(checkAlphabet('bech23')).toBe('bech23')
 })
 
 test('rejects alphabets that are too short or repeat a character', () => {
-	expect(() => resolveAlphabet('a')).toThrow()
-	expect(() => resolveAlphabet('abca')).toThrow()
-})
-
-test('tells whether letters are all one case', () => {
-	expect(isSingleCase(ALPHABETS.bech32)).toBe(true)
-	expect(isSingleCase(ALPHABETS.rfc4648)).toBe(true)
-	expect(isSingleCase('0123456789')).toBe(true)
-	expect(isSingleCase('abcABC')).toBe(false)
+	expect(() => checkAlphabet('a')).toThrow(RangeError)
+	expect(() => checkAlphabet('abca')).toThrow(RangeError)
 })
