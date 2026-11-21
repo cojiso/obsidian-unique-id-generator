@@ -16,7 +16,9 @@ export default defineConfig([
 		languageOptions: {
 			parserOptions: {
 				projectService: {
+					// どの tsconfig にも入らない設定ファイルとスクリプトは、Node と Bun の型を持つ tsconfig.tools.json で読む。
 					allowDefaultProject: ['eslint.config.mts', 'scripts/*.ts'],
+					defaultProject: 'tsconfig.tools.json',
 				},
 				tsconfigRootDir: import.meta.dirname,
 			},
