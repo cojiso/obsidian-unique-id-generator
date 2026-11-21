@@ -1,4 +1,8 @@
-import { type App, PluginSettingTab, Setting } from 'obsidian'
+import {
+	type App,
+	PluginSettingTab,
+	type SettingDefinitionItem,
+} from 'obsidian'
 import type UniqueIdGeneratorPlugin from './main'
 
 export interface UniqueIdGeneratorSettings {
@@ -18,23 +22,14 @@ export class UniqueIdGeneratorSettingTab extends PluginSettingTab {
 		this.plugin = plugin
 	}
 
-	display(): void {
-		const { containerEl } = this
-
-		containerEl.empty()
-
-		new Setting(containerEl).setName('Format').setHeading()
-
-		new Setting(containerEl)
-			.setName('Prefix')
-			.setDesc('Text added before every ID.')
-			.addText((text) =>
-				text
-					.setValue(this.plugin.settings.prefix)
-					.onChange(async (value) => {
-						this.plugin.settings.prefix = value
-						await this.plugin.saveSettings()
-					}),
-			)
+	// 宣言的な設定 API（Obsidian 1.13.0 以上）。値の読み書きと保存は Obsidian が行う。
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		return [
+			{
+				name: 'Prefix',
+				desc: 'Text added before every ID.',
+				control: { type: 'text', key: 'prefix' },
+			},
+		]
 	}
 }
