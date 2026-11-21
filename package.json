@@ -1,0 +1,26 @@
+{
+	"name": "unique-id-generator",
+	"version": "0.1.0",
+	"description": "Generate short unique IDs for Obsidian (https://obsidian.md)",
+	"main": "main.js",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "bun esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && bun esbuild.config.mjs production",
+		"check": "biome check . && eslint .",
+		"fix": "biome check --write . && eslint --fix .",
+		"bump": "bun scripts/version-bump.ts"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.6.8",
+		"@types/bun": "latest",
+		"esbuild": "0.25.5",
+		"eslint": "^9.39.4",
+		"eslint-plugin-obsidianmd": "^0.6.0",
+		"jiti": "^2.6.1",
+		"obsidian": "latest",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.59.1"
+	}
+}
