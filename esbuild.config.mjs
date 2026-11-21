@@ -1,3 +1,10 @@
+import {
+	copyFileSync,
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	writeFileSync,
+} from 'node:fs'
 import { builtinModules } from 'node:module'
 import process from 'node:process'
 import esbuild from 'esbuild'
@@ -9,6 +16,30 @@ if you want to view the source, please visit the github repository of this plugi
 `
 
 const prod = process.argv[2] === 'production'
+
+// 開発中は test-vault のプラグインフォルダに直接書き出す。
+// Hot Reload はファイル単位のシンボリックリンクに対応しないので、リンクは使わない。
+const vaultConfigDir = 'test-vault/.obsidian'
+const pluginDir = `${vaultConfigDir}/plugins/unique-id-generator`
+
+if (!prod) {
+	mkdirSync(pluginDir, { recursive: true })
+	copyFileSync('manifest.json', `${pluginDir}/manifest.json`)
+	if (existsSync('styles.css')) {
+		copyFileSync('styles.css', `${pluginDir}/styles.css`)
+	}
+	// Hot Reload は .hotreload のあるプラグインを、main.js が変わるたびに読み込み直す。
+	writeFileSync(`${pluginDir}/.hotreload`, '')
+
+	const enabledPath = `${vaultConfigDir}/community-plugins.json`
+	const enabled = existsSync(enabledPath)
+		? JSON.parse(readFileSync(enabledPath, 'utf8'))
+		: []
+	if (!enabled.includes('unique-id-generator')) {
+		enabled.push('unique-id-generator')
+		writeFileSync(enabledPath, JSON.stringify(enabled, null, '\t'))
+	}
+}
 
 const context = await esbuild.context({
 	banner: {
@@ -37,7 +68,7 @@ const context = await esbuild.context({
 	logLevel: 'info',
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
-	outfile: 'main.js',
+	outfile: prod ? 'main.js' : `${pluginDir}/main.js`,
 	minify: prod,
 })
 
