@@ -1,0 +1,52 @@
+/* ほかの選択から決まって押せない値を示す。選べる行で選んでいるものは CTA（setCta）で示す。 */
+.unique-id-generator-choice.is-fixed {
+	color: var(--text-accent);
+	box-shadow: inset 0 0 0 2px var(--interactive-accent);
+}
+
+/* 同じ結果になる呼び出しのコードブロック。既定ではまとまりの枠と同じ背景色で見えないので、地の色と枠線で区切る。 */
+.unique-id-generator-call pre {
+	margin: var(--size-4-2) 0 0;
+	background-color: var(--background-primary);
+	border: var(--border-width) solid var(--background-modifier-border);
+}
+
+/* 呼び出しは形式によって1行か2行になる。いつも2行ぶん取り、選び直してもモーダルの高さが変わらないようにする。 */
+.unique-id-generator-call pre code {
+	display: block;
+	min-height: 2lh;
+}
+
+/* 設定画面の行とモーダルの Example の行。名前と右側の値の下に、コードブロックを行の幅いっぱいで折り返す。 */
+.unique-id-generator-wrap-row {
+	flex-wrap: wrap;
+}
+
+/* 折り返すのはコードブロックだけにし、名前と説明は縮めて、右側の値とボタンを1段目に残す。 */
+.unique-id-generator-wrap-row > .setting-item-info {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+.unique-id-generator-wrap-row > .setting-item-control {
+	flex: 0 0 auto;
+}
+
+.unique-id-generator-call-slot {
+	flex-basis: 100%;
+}
+
+/* Encoding の行が出ていないあいだ、その行と同じ高さの空きを置き、Long にしてもモーダルが伸びないようにする。高さはコードで測って入れる。 */
+.unique-id-generator-reserve {
+	height: var(--unique-id-generator-reserve, 0px);
+}
+
+/* 設定画面の例の ID。コードブロックの下の右に、すぐ隣の作り直すボタンと並べる。 */
+.unique-id-generator-example {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: var(--size-4-1);
+	margin-top: var(--size-4-2);
+	color: var(--text-muted);
+}

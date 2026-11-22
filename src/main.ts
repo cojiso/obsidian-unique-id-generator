@@ -1,22 +1,28 @@
 import { type Editor, Notice, Plugin } from 'obsidian'
-import {
-	DEFAULT_SETTINGS,
-	type UniqueIdGeneratorSettings,
-	UniqueIdGeneratorSettingTab,
-} from './settings'
+import { createApi, type UniqueIdApi } from './api'
+import { UniqueIdGeneratorSettingTab } from './settings'
+import { readSettings, type UniqueIdGeneratorSettings } from './settings-data'
 
 export default class UniqueIdGeneratorPlugin extends Plugin {
 	settings!: UniqueIdGeneratorSettings
+	// スクリプトからは app.plugins.plugins['unique-id-generator'].api で呼ぶ。
+	api!: UniqueIdApi
 
 	async onload() {
-		await this.loadSettings()
+		this.settings = readSettings(await this.loadData())
+		this.api = createApi(() => this.settings)
 
 		this.addCommand({
 			id: 'copy-id',
 			name: 'Copy ID to clipboard',
 			callback: async () => {
-				await navigator.clipboard.writeText(this.generate())
-				new Notice('ID copied')
+				try {
+					const id = this.api.generate()
+					await navigator.clipboard.writeText(id)
+					new Notice(`Copied ${id}`)
+				} catch (error) {
+					notifyError(error)
+				}
 			},
 		})
 
@@ -24,29 +30,23 @@ export default class UniqueIdGeneratorPlugin extends Plugin {
 			id: 'insert-id',
 			name: 'Insert ID',
 			editorCallback: (editor: Editor) => {
-				editor.replaceSelection(this.generate())
+				try {
+					editor.replaceSelection(this.api.generate())
+				} catch (error) {
+					notifyError(error)
+				}
 			},
 		})
 
 		this.addSettingTab(new UniqueIdGeneratorSettingTab(this.app, this))
 	}
 
-	onunload() {}
-
-	// TODO: 方式ごとの生成器に置き換える。いまは仮に base36 の現在時刻（ミリ秒）を返す。
-	generate(): string {
-		return this.settings.prefix + Date.now().toString(36)
+	async updateSettings(next: UniqueIdGeneratorSettings) {
+		this.settings = next
+		await this.saveData(next)
 	}
+}
 
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<UniqueIdGeneratorSettings>,
-		)
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings)
-	}
+function notifyError(error: unknown) {
+	new Notice(error instanceof Error ? error.message : String(error))
 }
