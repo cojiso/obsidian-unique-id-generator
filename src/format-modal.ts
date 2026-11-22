@@ -88,6 +88,8 @@ export class FormatModal extends Modal {
 		this.component = new Component()
 		this.component.load()
 		this.setTitle('Default ID format')
+		// styles.css で、このモーダルの中だけに効かせる決まりがある（呼び出しのコードブロックの高さ）。
+		this.modalEl.addClass('unique-id-generator-modal')
 		const { contentEl } = this
 		const update = (change: () => void) => {
 			change()

@@ -11,8 +11,9 @@
 	border: var(--border-width) solid var(--background-modifier-border);
 }
 
-/* 呼び出しは形式によって1行か2行になる。いつも2行ぶん取り、選び直してもモーダルの高さが変わらないようにする。 */
-.unique-id-generator-call pre code {
+/* モーダルでは、呼び出しは形式によって1行か2行になる。いつも2行ぶん取り、選び直してもモーダルの高さが変わらないようにする。
+   設定画面では選び直さないので効かせない（効かせると、1行に収まったときに下が空く）。 */
+.unique-id-generator-modal .unique-id-generator-call pre code {
 	display: block;
 	min-height: 2lh;
 }
