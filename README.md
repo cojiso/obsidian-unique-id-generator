@@ -51,11 +51,11 @@ Ordering:
 
 Uniqueness:
 
-- Locally unique IDs never repeat on the device that makes them while Obsidian is running.
+- Locally unique IDs never repeat in the same vault on the device that makes them.
 - Collision-resistant IDs are 16 random characters (80 bits), so a million of them repeat with a probability of about 4 × 10⁻¹³.
 - Globally unique IDs are 128 bits and in practice never repeat anywhere.
 
-base36 and Sqids IDs are made from the current second. When two are made in the same second, the plugin adds 1 to the later one, and the commands and all API functions share this counter. Each device keeps its own counter, so two devices that make one in the same second can produce the same ID. If you create IDs on several synced devices, use a collision-resistant or globally unique format.
+base36 and Sqids IDs are made from the current second. When two are made in the same second, the plugin adds 1 to the later one, and the commands and all API functions share this counter. The counter is saved on the device for each vault, so it continues after the plugin is reloaded or Obsidian restarts. Another device keeps its own counter, so two devices that make one in the same second can produce the same ID. If you create IDs on several synced devices, use a collision-resistant or globally unique format.
 
 UUID v7, ULID and TypeID hold the same 128 bits in different encodings: hexadecimal, uppercase Crockford base32, and lowercase Crockford base32 after a type prefix. You can convert one into another without losing anything.
 
@@ -114,7 +114,7 @@ api.typeid({ prefix: 'user' })
 Options:
 
 - `unit`: `'second'` or `'millisecond'`, for `base36` and `sqids`. base36 pads seconds to 7 digits and milliseconds to 9, so the IDs sort correctly until the year 4453 and 5188 respectively.
-- `alphabet`: a string of distinct characters, for `sqids` and `nanoid`. `api.alphabets` has three:
+- `alphabet`: a string of 2 to 256 distinct characters, for `sqids` and `nanoid`. Emoji and other characters outside the Basic Multilingual Plane are not allowed, and Sqids needs at least 3 ASCII characters. `api.alphabets` has three:
 
   | Name        | Characters                         | Notes                                         |
   | ----------- | ---------------------------------- | --------------------------------------------- |
@@ -122,13 +122,13 @@ Options:
   | `crockford` | `0123456789abcdefghjkmnpqrstvwxyz` | Lowercase Crockford base32, without `i l o u` |
   | `rfc4648`   | `ABCDEFGHIJKLMNOPQRSTUVWXYZ234567` | RFC 4648 base32                               |
 
-- `minLength`: the shortest ID `sqids` makes. With the default 0, IDs are as long as the number needs.
-- `size`: the number of characters `nanoid` makes.
+- `minLength`: the shortest ID `sqids` makes, from 0 to 255. With the default 0, IDs are as long as the number needs.
+- `size`: the number of characters `nanoid` makes, from 1 to 1024.
 - `prefix`: the TypeID type prefix, up to 63 lowercase letters and underscores, starting and ending with a letter. The function adds the separator `_`, and leaves it out when the prefix is empty.
 
 To change the case of an ID, call `toUpperCase()` or `toLowerCase()` on it.
 
-An unknown or misspelled option, an invalid value, or an argument to a function that takes none throws an error that names the function.
+An unknown or misspelled option, an invalid value, or an argument to a function that takes none throws an error that names the function. Because of the last rule, pass a function to callbacks instead of the API function itself: to make several IDs at once, write `Array.from({ length: 3 }, () => api.ulid())`, not `[1, 2, 3].map(api.ulid)`.
 
 ## Decoding the time
 
