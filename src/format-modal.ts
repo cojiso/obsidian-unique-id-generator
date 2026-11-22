@@ -138,9 +138,9 @@ export class FormatModal extends Modal {
 		const exampleRow = addRow(group).setName('Example')
 		exampleRow.settingEl.addClass('unique-id-generator-wrap-row')
 		// addDisplayValue, available from Obsidian 1.13.1, is the official component for showing a row's value.
-		const idValue = capture<DisplayValueComponent>((cb) =>
-			exampleRow.addDisplayValue(cb),
-		)
+		const idValue = capture<DisplayValueComponent>((cb) => {
+			exampleRow.addDisplayValue(cb)
+		})
 		const showExample = () => idValue.setValue(example(this.view().preview))
 		exampleRow.addExtraButton((b) =>
 			b
@@ -178,9 +178,8 @@ export class FormatModal extends Modal {
 		const save = new ButtonComponent(footer.controlEl)
 			.setButtonText('Save')
 			.setCta()
-			.onClick(async () => {
-				await this.onSave(this.view().next)
-				this.close()
+			.onClick(() => {
+				void this.save()
 			})
 
 		const refresh = () => {
@@ -214,6 +213,11 @@ export class FormatModal extends Modal {
 			save.setDisabled(!view.canSave)
 		}
 		refresh()
+	}
+
+	private async save(): Promise<void> {
+		await this.onSave(this.view().next)
+		this.close()
 	}
 
 	onClose(): void {
@@ -292,5 +296,7 @@ function measureRowHeight(row: Setting): number {
 
 // SettingGroup.addSetting returns the group, so this returns the created row instead.
 function addRow(group: SettingGroup): Setting {
-	return capture<Setting>((cb) => group.addSetting(cb))
+	return capture<Setting>((cb) => {
+		group.addSetting(cb)
+	})
 }
