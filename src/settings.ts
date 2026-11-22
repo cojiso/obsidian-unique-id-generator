@@ -38,10 +38,10 @@ export class UniqueIdGeneratorSettingTab extends PluginSettingTab {
 					component.load()
 					setting.settingEl.addClass('unique-id-generator-wrap-row')
 					setting.setDesc('Used by the commands and api.generate().')
-					// 右上は Change… だけにする。例の ID を Change… の隣に置くと、Change… がその ID を変えるボタンに見えるので、
+					// 右上は Change... だけにする。例の ID を Change... の隣に置くと、Change... がその ID を変えるボタンに見えるので、
 					// 例の ID とすぐ隣の作り直すボタンは、コードブロックの下の右に置く（呼び出しと、その結果の並び）。
 					setting.addButton((b) =>
-						b.setButtonText('Change…').onClick(() => {
+						b.setButtonText('Change...').onClick(() => {
 							new FormatModal(
 								this.app,
 								this.plugin.settings,
