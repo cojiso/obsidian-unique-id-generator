@@ -5,10 +5,10 @@ export interface SqidsOptions {
 	minLength?: number
 }
 
-// Sqids を作るときに alphabet の並べ替えと blocklist の絞り込みが走るので、同じ設定のものは使い回す。
+// Creating a Sqids instance shuffles the alphabet and filters the blocklist, so instances are reused per setting.
 const cache = new Map<string, Sqids>()
 
-// 整数の列を Sqids にする。いまは時刻1つだけを渡すが、数値の入力を足すときのために列で受け取る。
+// Takes a list of integers. Only one time value is passed now, but a list lets numeric input be added without changing the signature.
 export function encodeSqids(
 	numbers: number[],
 	{ alphabet, minLength = 0 }: SqidsOptions,

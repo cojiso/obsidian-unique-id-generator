@@ -51,8 +51,8 @@ describe('TypeID spec valid.yml', () => {
 	})
 })
 
-// invalid.yml は TypeID の文字列を読み取るためのテストで、このプラグインは読み取らない。接頭辞が理由のものだけを、接頭辞の確かめに使う。
-// prefix-empty は後半が空なのが理由で、接頭辞 "prefix" 自体は正しい。
+// invalid.yml tests parsing TypeID strings, which this plugin does not do. Only the cases that fail because of the prefix are used to check prefixes.
+// prefix-empty fails because the suffix is empty; its prefix "prefix" itself is valid.
 describe('TypeID spec invalid.yml prefixes', () => {
 	const cases = invalid.filter(
 		(c) => c.name.startsWith('prefix-') && c.name !== 'prefix-empty',

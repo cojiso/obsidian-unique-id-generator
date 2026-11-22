@@ -21,8 +21,8 @@ export class UniqueIdGeneratorSettingTab extends PluginSettingTab {
 		this.plugin = plugin
 	}
 
-	// 宣言的な設定 API（Obsidian 1.13.0 以上）。
-	// 形式はうっかり変えると ID の見た目が揃わなくなるので、ここには今の選択を出すだけにし、変えるのはモーダルで行う。
+	// Declarative settings API, available from Obsidian 1.13.0.
+	// Changing the format by accident would leave IDs of mixed forms, so this tab only shows the current choice, and changes happen in the modal.
 	getSettingDefinitions(): SettingDefinitionItem[] {
 		return [
 			{
@@ -35,12 +35,11 @@ export class UniqueIdGeneratorSettingTab extends PluginSettingTab {
 					'ULID',
 					'TypeID',
 				],
-				// 説明は1文。その下に行の幅いっぱいで、同じ結果になる呼び出しのコードブロック。
 				render: (setting: Setting) => {
 					const component = new Component()
 					component.load()
 					setting.settingEl.addClass('unique-id-generator-wrap-row')
-					// 使い方の詳しい説明は書き込まず、README へリンクする（Style guide の「背景が要るなら、説明からドキュメントへリンクする」）。
+					// Links to the README instead of explaining usage here, following the Obsidian style guide: if background is needed, link to the docs from the description.
 					setting.setDesc(
 						createFragment((f) => {
 							f.appendText(
@@ -52,8 +51,7 @@ export class UniqueIdGeneratorSettingTab extends PluginSettingTab {
 							})
 						}),
 					)
-					// 右上は Change... だけにする。例の ID を Change... の隣に置くと、Change... がその ID を変えるボタンに見えるので、
-					// 例の ID とすぐ隣の作り直すボタンは、コードブロックの下の右に置く（呼び出しと、その結果の並び）。
+					// Only Change... sits at the top right. Next to an example ID, Change... would look like a button that changes that ID, so the example ID and its regenerate button go below the code block on the right, as the result of the call.
 					setting.addButton((b) =>
 						b.setButtonText('Change...').onClick(() => {
 							new FormatModal(

@@ -1,29 +1,29 @@
-/* ほかの選択から決まって押せない値を示す。選べる行で選んでいるものは CTA（setCta）で示す。 */
+/* A value fixed by the other choices, which cannot be pressed. The selected value in a row that can be chosen uses CTA (setCta). */
 .unique-id-generator-choice.is-fixed {
 	color: var(--text-accent);
 	box-shadow: inset 0 0 0 2px var(--interactive-accent);
 }
 
-/* 同じ結果になる呼び出しのコードブロック。既定ではまとまりの枠と同じ背景色で見えないので、地の色と枠線で区切る。 */
+/* The equivalent call's code block. By default it has the same background as the group box and blends in, so a base background and a border set it apart. */
 .unique-id-generator-call pre {
 	margin: var(--size-4-2) 0 0;
 	background-color: var(--background-primary);
 	border: var(--border-width) solid var(--background-modifier-border);
 }
 
-/* モーダルでは、呼び出しは形式によって1行か2行になる。いつも2行ぶん取り、選び直してもモーダルの高さが変わらないようにする。
-   設定画面では選び直さないので効かせない（効かせると、1行に収まったときに下が空く）。 */
+/* In the modal, the call is one or two lines depending on the format. Always reserve two lines so that the modal height does not change when the choice changes.
+   Not applied in the settings tab, where the choice does not change; there it would leave a blank line under a one-line call. */
 .unique-id-generator-modal .unique-id-generator-call pre code {
 	display: block;
 	min-height: 2lh;
 }
 
-/* 設定画面の行とモーダルの Example の行。名前と右側の値の下に、コードブロックを行の幅いっぱいで折り返す。 */
+/* The settings tab row and the modal's Example row: the code block wraps below the name and the value on the right, at full row width. */
 .unique-id-generator-wrap-row {
 	flex-wrap: wrap;
 }
 
-/* 折り返すのはコードブロックだけにし、名前と説明は縮めて、右側の値とボタンを1段目に残す。 */
+/* Only the code block wraps: the name and description shrink so that the value and buttons on the right stay on the first line. */
 .unique-id-generator-wrap-row > .setting-item-info {
 	flex: 1 1 0;
 	min-width: 0;
@@ -37,12 +37,12 @@
 	flex-basis: 100%;
 }
 
-/* Encoding の行が出ていないあいだ、その行と同じ高さの空きを置き、Long にしてもモーダルが伸びないようにする。高さはコードで測って入れる。 */
+/* While the Encoding row is hidden, a space of the same height keeps the modal from growing when Long is chosen. The code measures the height and sets it. */
 .unique-id-generator-reserve {
 	height: var(--unique-id-generator-reserve, 0px);
 }
 
-/* 設定画面の例の ID。コードブロックの下の右に、すぐ隣の作り直すボタンと並べる。 */
+/* The example ID in the settings tab, at the right below the code block, next to its regenerate button. */
 .unique-id-generator-example {
 	display: flex;
 	justify-content: flex-end;

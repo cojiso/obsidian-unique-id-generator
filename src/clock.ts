@@ -1,7 +1,7 @@
 export type TimeUnit = 'second' | 'millisecond'
 
-// 時刻を整数で返す。前回出した値以下なら前回の値に 1 を足し、同じ時刻に続けて呼んでも重ならないようにする。
-// 前回の値は、このインスタンスがある間だけ覚える。秒とミリ秒は別々に覚える。
+// Returns the time as an integer. If it is not greater than the last value returned, returns the last value plus 1, so that calls within the same second or millisecond never repeat a value.
+// The last value lives only as long as this instance, and seconds and milliseconds are tracked separately.
 export class Clock {
 	private readonly now: () => number
 	private readonly last: Record<TimeUnit, number> = {

@@ -1,13 +1,13 @@
 export const ALPHABETS = Object.freeze({
-	// 小文字だけで、見間違えやすい 1 b i o を含まない。
+	// Lowercase only, without the easily confused 1, b, i, and o.
 	bech32: 'qpzry9x8gf2tvdw0s3jn54khce6mua7l',
-	// ULID と TypeID が使う文字集合（小文字）。i l o u を含まない。
+	// The character set of ULID and TypeID, in lowercase. Excludes i, l, o, and u.
 	crockford: '0123456789abcdefghjkmnpqrstvwxyz',
-	// RFC 4648 の base32。
+	// Base32 from RFC 4648.
 	rfc4648: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
 } as const)
 
-// alphabet は文字の並びそのものだけを受け取る。名前も受け取ると、打ち間違えた名前が短い alphabet として通ってしまう。
+// Takes only the characters themselves, not an alphabet name, so that a misspelled name cannot pass as a short alphabet.
 export function checkAlphabet(alphabet: string): string {
 	const chars = [...alphabet]
 	if (chars.length < 2) {

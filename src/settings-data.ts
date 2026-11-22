@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: UniqueIdGeneratorSettings = {
 	typeidPrefix: '',
 }
 
-// 保存されたデータは手で書き換えられることもあるので、正しい値だけを使い、ほかは既定に戻す。
+// Saved data can be edited by hand, so only valid values are used and the rest fall back to the defaults.
 export function readSettings(data: unknown): UniqueIdGeneratorSettings {
 	const stored: Record<string, unknown> =
 		typeof data === 'object' && data !== null ? { ...data } : {}

@@ -2,7 +2,7 @@ import { ALPHABETS } from './alphabets'
 import { DEFAULTS, type Format, type IdSettings } from './api'
 import { type TypeIdPrefixIssue, typeIdPrefixIssues } from './methods/uuid'
 
-// 設定画面のガイドの軸。保存するのは、軸から決まる形式（Format）だけ。
+// The axes the format modal uses to guide the choice. Only the Format they lead to is saved.
 export type Length = 'short' | 'medium' | 'long'
 export type Ordering = 'time-ordered' | 'unordered'
 export type Basis = 'time' | 'random'
@@ -15,7 +15,7 @@ export interface Choice {
 	encoding: Encoding
 }
 
-// 使わない軸にも値を持たせておき、Length を切り替えて戻ったときに前の選択が残るようにする。
+// Axes the format does not use still get a value, so that switching Length away and back restores the earlier selection.
 const UNUSED: Choice = {
 	length: 'short',
 	ordering: 'unordered',
@@ -76,10 +76,10 @@ export function toChoice(format: Format): Choice {
 	}
 }
 
-// 各軸が、選べるのか、ほかの選択から決まっているのか、当てはまらないのか。
-// 決まっている軸は、その値を見せる（どれでもないように描かない）。
-// Ordering は「文字列として並べると作った順になるか」だけの軸なので、乱数は Unordered に入る（時刻に戻せるかは Based on の性質）。
-// なので Ordering と Based on はいつも値を持ち、当てはまらないことがあるのは Encoding だけ。
+// Whether each axis can be chosen, is fixed by the other choices, or does not apply.
+// A fixed axis shows its value instead of appearing as if nothing is selected.
+// Ordering only means whether sorting the IDs as strings gives creation order, so random IDs count as Unordered. Whether the time can be decoded is a matter of Based on.
+// So Ordering and Based on always have a value, and only Encoding can be 'none'.
 export type AxisState<V extends string> =
 	| { kind: 'choose'; value: V }
 	| { kind: 'fixed'; value: V }
@@ -120,7 +120,7 @@ export function axisStates(choice: Choice): AxisStates {
 	}
 }
 
-// 形式を直接選んだときに軸を合わせる。その形式で使わない軸は、前に選んでいた値を残す（選べるようになったら戻すため）。
+// Syncs the axes when a format is picked directly. Axes that format does not use keep their earlier values, so those come back once the axes can be chosen again.
 export function chooseFormat(choice: Choice, format: Format): Choice {
 	const c = toChoice(format)
 	const next: Choice = { ...choice, length: c.length }
@@ -136,7 +136,7 @@ export function chooseFormat(choice: Choice, format: Format): Choice {
 	return next
 }
 
-// 保存したときに見た目が変わるか。TypeID 以外では prefix は使わないので比べない。
+// Whether saving would change the generated IDs. The prefix is compared only for TypeID, since no other format uses it.
 export function changed(a: IdSettings, b: IdSettings): boolean {
 	if (a.format !== b.format) {
 		return true
@@ -144,16 +144,16 @@ export function changed(a: IdSettings, b: IdSettings): boolean {
 	return b.format === 'typeid' && a.typeidPrefix !== b.typeidPrefix
 }
 
-// モーダルに何を出すか。モーダルの状態は軸の選択（choice）と prefix の入力だけで、ほかは全部ここで計算する。
+// What the modal shows. The modal's state is only the axis selection (choice) and the prefix input; everything else is computed here.
 export interface ModalView {
 	axes: { length: AxisState<Length> } & AxisStates
-	// Encoding と Type prefix の行は、当てはまらないことが多いので要るときだけ出す。
+	// The Encoding and Type prefix rows often do not apply, so they are shown only when needed.
 	showEncoding: boolean
 	showPrefix: boolean
 	prefixIssues: TypeIdPrefixIssue[]
-	// Save で保存するもの。正しくない prefix は保存せず、今の prefix を残す。
+	// Saved by Save. An invalid prefix is not saved, and the current prefix is kept.
 	next: IdSettings
-	// 例と呼び出しに使うもの。prefix が正しくないあいだも、prefix なしの TypeID で出し続ける。
+	// Used for the example and the call. While the prefix is invalid, they keep showing a TypeID without a prefix.
 	preview: IdSettings
 	canSave: boolean
 }
@@ -188,7 +188,7 @@ export function modalView(
 	}
 }
 
-// 形式を直接選ぶドロップダウンの項目名。
+// Item labels for the dropdown that picks a format directly.
 export const FORMAT_LABELS = {
 	base36: 'base36',
 	sqids: 'Sqids',
@@ -206,7 +206,7 @@ export const LABELS = {
 	encoding: { uuid: 'UUID', ulid: 'ULID', typeid: 'TypeID' },
 } as const
 
-// generate() と同じ結果になる呼び出し。既定値も省略せずに書き、何を選んでいるかを正確に見せる。そのままスクリプトにも写せる。
+// A call that gives the same result as generate(). Defaults are written out so that the call shows exactly what is selected and can be copied into a script as is.
 export function equivalentCall({ format, typeidPrefix }: IdSettings): string {
 	switch (format) {
 		case 'base36':

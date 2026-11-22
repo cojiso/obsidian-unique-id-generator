@@ -124,7 +124,7 @@ describe('one clock for every entry point', () => {
 
 	test('v7-based forms keep one order', () => {
 		const { api } = setup()
-		// 4つの形を ULID に揃えると、作った順に並び、重ならない。
+		// Converted to ULID, the four IDs sort in creation order and are all distinct.
 		const ids = [
 			uuidToULID(api.uuidv7()),
 			api.ulid(),

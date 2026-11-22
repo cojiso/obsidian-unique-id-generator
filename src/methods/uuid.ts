@@ -5,17 +5,17 @@ export function uuidV4(): string {
 	return v4()
 }
 
-// 同じミリ秒の中の順番は uuid が保つ。
+// The uuid library keeps the order within the same millisecond.
 export function uuidV7(): string {
 	return v7()
 }
 
-// 128ビットの先頭に0を2ビット足して130ビットにし、5ビットずつ Crockford base32 にした26文字（大文字）。
+// Pads the 128 bits with two leading zero bits to 130 bits and encodes them 5 bits at a time in Crockford base32, giving 26 uppercase characters.
 export function toULID(uuid: string): string {
 	return uuidToULID(uuid)
 }
 
-// TypeID の仕様の接頭辞：小文字と _ だけで63文字まで、先頭と末尾は英字。空でもよい。
+// The TypeID spec's prefix: up to 63 lowercase letters and underscores, starting and ending with a letter. It may be empty.
 const TYPEID_PREFIX = /^(?:[a-z](?:[a-z_]{0,61}[a-z])?)?$/
 
 export function isTypeIdPrefix(prefix: string): boolean {
@@ -24,7 +24,7 @@ export function isTypeIdPrefix(prefix: string): boolean {
 
 export type TypeIdPrefixIssue = 'characters' | 'length' | 'edges'
 
-// prefix がどの決まりから外れているか。設定画面で、外れた決まりだけをエラーに出すために使う。空なら何も外れていない。
+// Which rules the prefix breaks, so that the modal can show only those in the error. An empty array means it breaks none.
 export function typeIdPrefixIssues(prefix: string): TypeIdPrefixIssue[] {
 	const issues: TypeIdPrefixIssue[] = []
 	if (!/^[a-z_]*$/.test(prefix)) {
@@ -39,7 +39,7 @@ export function typeIdPrefixIssues(prefix: string): TypeIdPrefixIssue[] {
 	return issues
 }
 
-// TypeID の後半26文字は、ULID を小文字にしたものと同じ。接頭辞が空なら区切りの _ も付けない。
+// The 26-character suffix of a TypeID is the lowercase ULID. With an empty prefix, the _ separator is omitted too.
 export function toTypeID(prefix: string, uuid: string): string {
 	if (!isTypeIdPrefix(prefix)) {
 		throw new Error(

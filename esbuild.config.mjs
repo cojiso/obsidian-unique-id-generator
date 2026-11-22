@@ -17,11 +17,11 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `
 
-// main.js に同梱するライブラリの著作権表示とライセンスの文。MIT は、配る複製に両方を含めることを求める。
-// Obsidian が配るのは main.js、manifest.json、styles.css だけなので、main.js の末尾にコメントとして入れる。
-// 同梱するライブラリは dependencies から取る。どれも MIT で許諾の文が同じなので、著作権の行を並べ、許諾の文は1回だけ書く。
-// 許諾の文が違うライブラリ（MIT でないもの）が入ったら、黙って入れずにビルドを止める。
-// 見るのは dependencies だけで、依存の依存は見ない。今の依存はどれもほかに依存しないので漏れはないが、依存を持つライブラリを足すときは見直す。
+// Copyright notices and license text of the libraries bundled into main.js. The MIT license requires both in every distributed copy.
+// Obsidian distributes only main.js, manifest.json, and styles.css, so they go at the end of main.js as a comment.
+// The bundled libraries are taken from dependencies. All of them are MIT with the same permission text, so the notice lists each copyright line and includes the permission text once.
+// If a library is not under MIT or its permission text differs, the build fails instead of including it silently.
+// Only dependencies are checked, not their own dependencies. No current dependency has any, so nothing is missed, but recheck this when adding a library that does.
 function thirdPartyNotice() {
 	const MIT_PERMISSION = 'Permission is hereby granted'
 	const normalize = (text) => text.replace(/\s+/g, ' ').trim()
@@ -47,7 +47,7 @@ function thirdPartyNotice() {
 		} else if (normalize(body) !== normalize(permission)) {
 			throw new Error(`${name} has a different license text`)
 		}
-		// 著作権の行は、許諾の文より前（見出し）からだけ取る。免責の文の行頭にも COPYRIGHT HOLDERS があるため。
+		// Take copyright lines only from the header before the permission text, because a line in the disclaimer also starts with COPYRIGHT HOLDERS.
 		for (const line of text.slice(0, start).split('\n')) {
 			if (/^\s*copyright/i.test(line)) {
 				copyrights.push(`${name}: ${line.trim()}`)
@@ -59,22 +59,22 @@ function thirdPartyNotice() {
 
 const prod = process.argv[2] === 'production'
 
-// 開発中は test-vault のプラグインフォルダに直接書き出す。
-// Hot Reload はファイル単位のシンボリックリンクに対応しないので、リンクは使わない。
+// In development, build straight into the plugin folder in test-vault.
+// Hot Reload does not follow symlinks to individual files, so no links are used.
 const vaultConfigDir = 'test-vault/.obsidian'
 const pluginDir = `${vaultConfigDir}/plugins/unique-id-generator`
 
 if (!prod) {
 	mkdirSync(pluginDir, { recursive: true })
 	copyFileSync('manifest.json', `${pluginDir}/manifest.json`)
-	// styles.css は main.ts から読み込まないので esbuild の監視に入らない。直すたびにコピーして Hot Reload に拾わせる。
+	// styles.css is not imported from main.ts, so esbuild does not watch it. Copy it on every change so that Hot Reload picks it up.
 	if (existsSync('styles.css')) {
 		const copyStyles = () =>
 			copyFileSync('styles.css', `${pluginDir}/styles.css`)
 		copyStyles()
 		watch('styles.css', copyStyles)
 	}
-	// Hot Reload は .hotreload のあるプラグインを、main.js が変わるたびに読み込み直す。
+	// Hot Reload reloads a plugin that has a .hotreload file whenever its main.js changes.
 	writeFileSync(`${pluginDir}/.hotreload`, '')
 
 	const enabledPath = `${vaultConfigDir}/community-plugins.json`

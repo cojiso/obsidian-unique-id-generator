@@ -17,7 +17,7 @@ export const FORMATS = [
 
 export type Format = (typeof FORMATS)[number]
 
-// generate() が使う、設定画面で選んだもの。
+// What the user chose in the settings, used by generate().
 export interface IdSettings {
 	format: Format
 	typeidPrefix: string
@@ -54,7 +54,7 @@ export interface UniqueIdApi {
 	readonly alphabets: typeof ALPHABETS
 }
 
-// オプションの既定値。設定画面に出す「同じ結果になる呼び出し」もここから作る。
+// The equivalent call shown in the settings is also built from these defaults.
 export const DEFAULTS = Object.freeze({
 	base36: Object.freeze({ unit: 'second' }),
 	sqids: Object.freeze({
@@ -66,11 +66,11 @@ export const DEFAULTS = Object.freeze({
 	typeid: Object.freeze({ prefix: '' }),
 } as const)
 
-// 先頭を 0 で埋める桁数。秒は 4453 年まで、ミリ秒は 5188 年まで桁が増えない。
+// Width to zero-pad to. Seconds fit in 7 digits until 4453-04-05, and milliseconds fit in 9 digits until 5188-04-22.
 const BASE36_WIDTH: Record<TimeUnit, number> = { second: 7, millisecond: 9 }
 
-// 形式ごとの関数は設定を見ない。設定を使うのは generate() だけ。
-// 時刻の +1 を正しく効かせるため、clock はすべての関数とコマンドで1つを使う。
+// Only generate() reads the settings; the per-format functions ignore them.
+// All functions and commands share one clock so that its +1 keeps time values distinct across them.
 export function createApi(
 	getSettings: () => IdSettings,
 	clock: Clock = new Clock(),
@@ -142,7 +142,7 @@ export function createApi(
 	})
 }
 
-// エラーの文の頭に、どの関数で起きたかを付ける。ライブラリが投げたエラーも同じように扱う。
+// Prefixes error messages with the function name, including errors thrown by the libraries.
 function named<A extends unknown[]>(
 	name: string,
 	fn: (...args: A) => string,
@@ -159,7 +159,7 @@ function named<A extends unknown[]>(
 	}
 }
 
-// オプションを受け取らない関数に何か渡したら、黙って無視せずエラーにする。
+// Throws instead of silently ignoring arguments passed to a function that takes none.
 function withoutArgs(name: string, fn: () => string): () => string {
 	return named(name, (...args: unknown[]) => {
 		if (args.length > 0) {
@@ -169,7 +169,7 @@ function withoutArgs(name: string, fn: () => string): () => string {
 	})
 }
 
-// 知らないキーは、綴り間違いに気づけるようエラーにする。
+// Unknown keys throw so that a misspelled option is noticed.
 function readOptions<K extends string>(
 	options: unknown,
 	keys: readonly K[],
@@ -249,7 +249,7 @@ function readString(name: string, value: unknown, fallback: string): string {
 	return value
 }
 
-// エラーの文に、渡された値を見せる。オブジェクトも [object Object] にならないようにする。
+// Shows the passed value in error messages, without turning objects into [object Object].
 function show(value: unknown): string {
 	return JSON.stringify(value) ?? typeof value
 }

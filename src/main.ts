@@ -5,7 +5,7 @@ import { readSettings, type UniqueIdGeneratorSettings } from './settings-data'
 
 export default class UniqueIdGeneratorPlugin extends Plugin {
 	settings!: UniqueIdGeneratorSettings
-	// スクリプトからは app.plugins.plugins['unique-id-generator'].api で呼ぶ。
+	// Scripts call it as app.plugins.plugins['unique-id-generator'].api.
 	api!: UniqueIdApi
 
 	async onload() {

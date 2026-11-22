@@ -25,14 +25,14 @@ import {
 import type { TypeIdPrefixIssue } from './methods/uuid'
 import { capture, example, renderCall } from './ui'
 
-// 重なりにくさの範囲は、分散システムの用語（locally / globally unique、collision-resistant）で短く言う。
+// States the uniqueness scope briefly in distributed-systems terms: locally unique, collision-resistant, globally unique.
 const LENGTH_DESC: Record<Length, string> = {
 	short: '7 or 8 characters. Locally unique.',
 	medium: '16 characters. Collision-resistant.',
 	long: '26 to 36 characters. Globally unique.',
 }
 
-// 言う価値があるのは Time の「時刻に戻せる」ほう。Random は軽く言うだけにする。どちらも1行なので、切り替えても高さは変わらない。
+// What is worth saying is that Time can be decoded back to the time; Random gets only a light line. Both are one line, so switching does not change the height.
 const BASIS_DESC: Record<Basis, string> = {
 	time: 'The time can be decoded from the ID.',
 	random: 'Made from random numbers.',
@@ -43,28 +43,27 @@ const ORDERING_DESC: Record<Ordering, string> = {
 	unordered: 'Consecutive IDs look unrelated.',
 }
 
-// Encoding は値ごとに出し分けず、行にいつも同じ1文を出す。形は Example で見え、名前の言い換えは要らない。
-// 3つとも中身が同じで変換できることは、名前からも Example からも分からないので、それだけを言う。文が変わらないので高さも動かない。
+// Encoding shows the same sentence for every value. The Example already shows the form, and the names need no paraphrase.
+// Neither the names nor the Example reveal that all three hold the same bits and convert into each other, so that is all it says. The fixed sentence also keeps the height from changing.
 const ENCODING_DESC = 'Lossless encodings of the same 128 bits.'
 
-// 説明は使える文字だけを言う。細かい決まり（63文字まで、先頭と末尾は英字）は、外れたときにエラーで出す。
+// The description names only the allowed characters. The other rules, up to 63 characters and starting and ending with a letter, appear as errors when broken.
 const PREFIX_DESC = 'Lowercase letters and underscores.'
-// 外れた決まりだけを、エラーに並べて出す。
 const PREFIX_ERRORS: Record<TypeIdPrefixIssue, string> = {
 	characters: 'Use only lowercase letters and underscores.',
 	length: 'Use up to 63 characters.',
 	edges: 'Start and end with a letter.',
 }
 
-// 一度選んだらほとんど変えない設定なので、Save を押すまで何も保存しない。閉じても Cancel でも元のまま。
-// 状態は軸の選択（choice）と prefix の入力だけ。何を出すかは modalView（choice.ts、テストあり）が計算し、ここは画面に当てはめるだけにする。
-// どの部品を操作しても「状態を書き換えて refresh()」なので、軸のボタンとドロップダウンが食い違うことはない。
+// The format is rarely changed once chosen, so nothing is saved until Save is pressed. Closing or Cancel leaves the settings as they were.
+// The state is only the axis selection (choice) and the prefix input. modalView in choice.ts, which is tested, computes what to show; this class only applies it to the screen.
+// Every control updates the state and then calls refresh(), so the axis buttons and the dropdown cannot disagree.
 export class FormatModal extends Modal {
 	private readonly current: IdSettings
 	private readonly onSave: (next: IdSettings) => Promise<void>
 	private choice: Choice
 	private prefix: string
-	// MarkdownRenderer が描いたものは、この Component が片付ける。モーダルを開くたびに作り直す。
+	// Cleans up what MarkdownRenderer renders.
 	private component = new Component()
 	private renderToken = 0
 
@@ -88,7 +87,7 @@ export class FormatModal extends Modal {
 		this.component = new Component()
 		this.component.load()
 		this.setTitle('Default ID format')
-		// styles.css で、このモーダルの中だけに効かせる決まりがある（呼び出しのコードブロックの高さ）。
+		// styles.css has rules that apply only inside this modal, such as the height of the call code block.
 		this.modalEl.addClass('unique-id-generator-modal')
 		const { contentEl } = this
 		const update = (change: () => void) => {
@@ -96,11 +95,11 @@ export class FormatModal extends Modal {
 			refresh()
 		}
 
-		// ドキュメントの「Settings inside a modal」に沿い、モーダルの中も Setting と SettingGroup で組む。設定画面と同じ揃え方になる。
-		// 開いた時点で選択肢と Example に今の設定が出るので、今の設定だけの枠は置かない。まとまりが1つなので見出しも付けない。
+		// Following "Settings inside a modal" in the Obsidian docs, the modal is also built from Setting and SettingGroup, which aligns it like the settings tab.
+		// The choices and the Example already show the current setting when the modal opens, so there is no separate box for it. There is only one group, so it has no heading.
 		const group = new SettingGroup(contentEl)
 
-		// 上の行の選択で下の行が決まる順に並べる。Length で Based on が決まり（Short は時刻、Medium は乱数）、Based on で Ordering が決まる。
+		// Rows are ordered so that each choice decides the rows below it. Length decides Based on, as Time for Short and Random for Medium, and in Long, Based on decides Ordering.
 		const length = choiceRow(group, 'Length', LABELS.length, (v) =>
 			update(() => {
 				this.choice = { ...this.choice, length: v }
@@ -135,11 +134,10 @@ export class FormatModal extends Modal {
 					),
 			)
 
-		// 選んだ結果は、まとまりの最後の1行に出す。右に例の ID とすぐ隣に作り直すボタン、その下に行の幅いっぱいで同じ結果になる呼び出しのコードブロック。
-		// 言葉（Short · Unordered）はすぐ上のボタンで見えているので繰り返さない。コピーのボタンはコードブロック自身に付く。
+		// The Example row does not repeat the labels, such as Short · Unordered, because the buttons right above show them.
 		const exampleRow = addRow(group).setName('Example')
 		exampleRow.settingEl.addClass('unique-id-generator-wrap-row')
-		// 右の ID は、行の値を見せる公式の部品（addDisplayValue、1.13.1 から）で出す。
+		// addDisplayValue, available from Obsidian 1.13.1, is the official component for showing a row's value.
 		const idValue = capture<DisplayValueComponent>((cb) =>
 			exampleRow.addDisplayValue(cb),
 		)
@@ -150,23 +148,23 @@ export class FormatModal extends Modal {
 				.setTooltip('Generate another example')
 				.onClick(showExample),
 		)
-		// コードブロックは行（settingEl）の直下に置き、CSS で名前と ID の行の下に折り返す。
+		// The code block goes directly under the row (settingEl), and CSS wraps it below the name and the ID.
 		const callEl = exampleRow.settingEl.createDiv({
 			cls: 'unique-id-generator-call-slot',
 		})
 
-		// Long はよく選ばれ、選ぶと Encoding の行が1つ増える。そのたびにモーダルが伸びないよう、Encoding の行が出ていないあいだは同じ高さの空きを置いておく。
-		// 空きはまとまりの外（ボタンの行との間）に置くので、Long にすると Example が下にずれ、空きが縮むだけでモーダルの高さは変わらない。
-		// Type prefix の行（TypeID のとき）は選ぶ人が少ないので予約しない。
+		// Long is a common choice and adds the Encoding row. To keep the modal from growing each time, a space of the same height stands in while the Encoding row is hidden.
+		// The space sits outside the group, above the button row, so choosing Long moves the Example down and shrinks the space, and the modal height stays the same.
+		// The Type prefix row, shown for TypeID, gets no space because few people choose it.
 		const reserve = contentEl.createDiv({
 			cls: 'unique-id-generator-reserve',
 		})
-		// 説明が入ってから測るので、最初の refresh() で測る。
+		// Measured in the first refresh(), once the description is in place.
 		let encodingHeight: number | undefined
 
 		const footer = new Setting(contentEl)
-		// 名前を知っている人のための近道。形式を直接選ぶドロップダウンを、ボタンの行の左に置く。
-		// Save のすぐ隣で、何を保存するかが名前で見える確かめにもなり、行も増えない。
+		// A shortcut for people who know the format names: a dropdown that picks the format directly, at the left of the button row.
+		// Next to Save, it also confirms by name what will be saved, without adding a row.
 		const formatDropdown = new DropdownComponent(footer.infoEl)
 			.addOptions(FORMAT_LABELS)
 			.onChange((v) =>
@@ -223,7 +221,7 @@ export class FormatModal extends Modal {
 		this.contentEl.empty()
 	}
 
-	// 描くのは非同期なので、続けて押されたときは最後の1回の結果だけを残す。
+	// Rendering is async, so when the buttons are pressed in quick succession, only the last result is kept.
 	private async renderCall(
 		el: HTMLElement,
 		settings: IdSettings,
@@ -236,7 +234,7 @@ export class FormatModal extends Modal {
 	}
 }
 
-// 公開の API に切り替えボタンがないので、選択肢の数だけボタンを並べる。
+// The public API has no toggle button group, so each option gets its own button.
 function choiceRow<V extends string>(
 	group: SettingGroup,
 	name: string,
@@ -253,8 +251,8 @@ function choiceRow<V extends string>(
 				.onClick(() => onSelect(value))
 		})
 	}
-	// 行は消さずにいつも出しておき、高さや目線が動かないようにする。押せない行の説明は選べるときと同じ。押せないことと決まった値は、ボタンの見た目で分かる。
-	// 選べる行で選んでいるものは Obsidian の標準の強調（CTA）、ほかの選択から決まって押せない値は styles.css の枠で示す。当てはまらない行は、どれも強調しない。
+	// A disabled row stays shown so that heights and the reader's eye do not shift. Its description is the same as when it can be chosen; the button styling shows that it is disabled and which value is fixed.
+	// In a row that can be chosen, the selected value uses Obsidian's standard CTA highlight. A value fixed by the other choices uses the outline from styles.css. A row that does not apply highlights nothing.
 	const apply = (state: AxisState<V>, desc: string) => {
 		const choosable = state.kind === 'choose'
 		setting.setDisabled(!choosable)
@@ -281,8 +279,8 @@ function descOf<V extends string>(
 	return state.kind === 'none' ? '' : descs[state.value]
 }
 
-// 行そのものの高さではなく、行を出したときと消したときの、まとまりの高さの差を測る（行の間の余白や区切り線の重なりを含めるため）。
-// 行の高さはテーマで変わるので、開いたときに測る。
+// Measures how much the group's height changes between the row shown and hidden, not the row itself, so that the gap between rows and the overlapping dividers are included.
+// Row height depends on the theme, so it is measured when the modal opens.
 function measureRowHeight(row: Setting): number {
 	const items = row.settingEl.parentElement
 	row.settingEl.toggle(true)
@@ -292,7 +290,7 @@ function measureRowHeight(row: Setting): number {
 	return shown - hidden
 }
 
-// SettingGroup.addSetting は group を返すので、作った行を受け取れる形にする。
+// SettingGroup.addSetting returns the group, so this returns the created row instead.
 function addRow(group: SettingGroup): Setting {
 	return capture<Setting>((cb) => group.addSetting(cb))
 }

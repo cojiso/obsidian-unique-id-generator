@@ -1,6 +1,6 @@
-// 使い方：bun run bump 0.2.0
-// package.json、manifest.json、versions.json の版を上げ、コミットしてタグを打つ。
-// タグは版番号そのまま（v を付けない）。Obsidian はタグと manifest.json の version が一致することを求める。
+// Usage: bun run bump 0.2.0
+// Bumps the version in package.json, manifest.json, and versions.json, then commits and tags it.
+// The tag is the bare version number without a leading v, because Obsidian requires the tag to match the version in manifest.json.
 import { $ } from 'bun'
 
 const version = process.argv[2]

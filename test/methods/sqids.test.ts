@@ -11,7 +11,7 @@ test('decodes back to the same seconds with the same alphabet', () => {
 	expect(new Sqids({ alphabet }).decode(id)).toEqual([seconds])
 })
 
-// Sqids は alphabet の1文字を区切りに取っておくので31進数で書き、先頭に1文字足す。8文字なのは 31^6 秒（1998-02-15）から 31^7 秒（2841-11-03）の手前まで。
+// Sqids reserves one alphabet character as a separator, so it writes the number in base 31 and adds one leading character. IDs have 8 characters from 31^6 seconds (1998-02-15) up to, but not including, 31^7 seconds (2841-11-03).
 test('uses 8 characters from the alphabet for seconds from 1998 to 2841', () => {
 	for (const seconds of [31 ** 6, 1_763_700_000, 31 ** 7 - 1]) {
 		const id = encodeSqids([seconds], { alphabet })

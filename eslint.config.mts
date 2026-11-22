@@ -1,5 +1,5 @@
-// eslint-plugin-obsidianmd の recommended は、community directory の自動レビューが使う設定の土台。
-// フォーマットと import の並びは Biome に任せる。
+// The recommended config of eslint-plugin-obsidianmd is the base of the config used by the automated review for the community directory.
+// Biome handles formatting and import order.
 import { defineConfig, globalIgnores } from 'eslint/config'
 import obsidianmd from 'eslint-plugin-obsidianmd'
 
@@ -16,7 +16,7 @@ export default defineConfig([
 		languageOptions: {
 			parserOptions: {
 				projectService: {
-					// どの tsconfig にも入らない設定ファイルとスクリプトは、Node と Bun の型を持つ tsconfig.tools.json で読む。
+					// Config files and scripts that no tsconfig includes are read with tsconfig.tools.json, which has the Node and Bun types.
 					allowDefaultProject: ['eslint.config.mts', 'scripts/*.ts'],
 					defaultProject: 'tsconfig.tools.json',
 				},
