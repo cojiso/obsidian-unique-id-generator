@@ -25,6 +25,9 @@
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.59.1"
 	},
+	"overrides": {
+		"eslint-plugin-n": "17.24.0"
+	},
 	"dependencies": {
 		"nanoid": "6.0.2",
 		"sqids": "0.3.0",
