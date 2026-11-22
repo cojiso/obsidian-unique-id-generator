@@ -1,6 +1,6 @@
 {
 	"name": "unique-id-generator",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Generate unique IDs (base36, Sqids, NanoID, UUID, ULID, TypeID) from commands or from Templater and other scripts.",
 	"main": "main.js",
 	"license": "MIT",
