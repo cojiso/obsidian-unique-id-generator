@@ -3,7 +3,7 @@
 	"name": "Unique ID Generator",
 	"version": "0.1.0",
 	"minAppVersion": "1.13.1",
-	"description": "Generate short unique IDs (Sqids, base36, ULID, UUID, NanoID) from commands and Templater or QuickAdd scripts.",
+	"description": "Generate unique IDs (base36, Sqids, NanoID, UUID, ULID, TypeID) from commands or from Templater and other scripts.",
 	"author": "cojiso",
 	"authorUrl": "https://github.com/cojiso",
 	"isDesktopOnly": false
