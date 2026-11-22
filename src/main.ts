@@ -1,7 +1,10 @@
 import { type Editor, Notice, Plugin } from 'obsidian'
 import { createApi, type UniqueIdApi } from './api'
+import { Clock } from './clock'
 import { UniqueIdGeneratorSettingTab } from './settings'
 import { readSettings, type UniqueIdGeneratorSettings } from './settings-data'
+
+const CLOCK_STORAGE_KEY = 'unique-id-generator-clock'
 
 export default class UniqueIdGeneratorPlugin extends Plugin {
 	settings!: UniqueIdGeneratorSettings
@@ -10,7 +13,16 @@ export default class UniqueIdGeneratorPlugin extends Plugin {
 
 	async onload() {
 		this.settings = readSettings(await this.loadData())
-		this.api = createApi(() => this.settings)
+		// Keep the clock's last values in this vault's localStorage on this device, so IDs made from the time don't repeat after a reload or restart.
+		this.api = createApi(
+			() => this.settings,
+			new Clock(Date.now, {
+				load: (): unknown =>
+					this.app.loadLocalStorage(CLOCK_STORAGE_KEY) as unknown,
+				save: (state) =>
+					this.app.saveLocalStorage(CLOCK_STORAGE_KEY, state),
+			}),
+		)
 
 		this.addCommand({
 			id: 'copy-id',
