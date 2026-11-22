@@ -154,7 +154,7 @@ Once the plugin is listed in the community directory:
 
 Manually:
 
-1. Download `main.js`, `manifest.json` and `styles.css` from the latest release.
+1. Download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/cojiso/obsidian-unique-id-generator/releases/latest).
 2. Put them in `.obsidian/plugins/unique-id-generator/` in your vault.
 3. Reload Obsidian and enable the plugin in **Settings → Community plugins**.
 
