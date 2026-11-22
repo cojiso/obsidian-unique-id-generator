@@ -54,6 +54,18 @@ export interface UniqueIdApi {
 	readonly alphabets: typeof ALPHABETS
 }
 
+// オプションの既定値。設定画面に出す「同じ結果になる呼び出し」もここから作る。
+export const DEFAULTS = Object.freeze({
+	base36: Object.freeze({ unit: 'second' }),
+	sqids: Object.freeze({
+		alphabet: ALPHABETS.bech32,
+		minLength: 0,
+		unit: 'second',
+	}),
+	nanoid: Object.freeze({ alphabet: ALPHABETS.bech32, size: 16 }),
+	typeid: Object.freeze({ prefix: '' }),
+} as const)
+
 // 先頭を 0 で埋める桁数。秒は 4453 年まで、ミリ秒は 5188 年まで桁が増えない。
 const BASE36_WIDTH: Record<TimeUnit, number> = { second: 7, millisecond: 9 }
 
@@ -65,29 +77,34 @@ export function createApi(
 ): UniqueIdApi {
 	const base36 = (options?: unknown) => {
 		const o = readOptions(options, ['unit'])
-		const unit = readUnit(o.unit)
+		const unit = readUnit(o.unit, DEFAULTS.base36.unit)
 		return encodeBase36(clock.next(unit), BASE36_WIDTH[unit])
 	}
 
 	const sqids = (options?: unknown) => {
 		const o = readOptions(options, ['alphabet', 'minLength', 'unit'])
-		return encodeSqids([clock.next(readUnit(o.unit))], {
-			alphabet: readAlphabet(o.alphabet),
-			minLength: readInteger('minLength', o.minLength, 0, 0),
+		const d = DEFAULTS.sqids
+		return encodeSqids([clock.next(readUnit(o.unit, d.unit))], {
+			alphabet: readAlphabet(o.alphabet, d.alphabet),
+			minLength: readInteger('minLength', o.minLength, d.minLength, 0),
 		})
 	}
 
 	const nanoidFn = (options?: unknown) => {
 		const o = readOptions(options, ['alphabet', 'size'])
+		const d = DEFAULTS.nanoid
 		return nanoid(
-			readAlphabet(o.alphabet),
-			readInteger('size', o.size, 16, 1),
+			readAlphabet(o.alphabet, d.alphabet),
+			readInteger('size', o.size, d.size, 1),
 		)
 	}
 
 	const typeid = (options?: unknown) => {
 		const o = readOptions(options, ['prefix'])
-		return toTypeID(readString('prefix', o.prefix, ''), uuidV7())
+		return toTypeID(
+			readString('prefix', o.prefix, DEFAULTS.typeid.prefix),
+			uuidV7(),
+		)
 	}
 
 	const generate = (): string => {
@@ -177,9 +194,9 @@ function readOptions<K extends string>(
 	return options
 }
 
-function readUnit(value: unknown): TimeUnit {
+function readUnit(value: unknown, fallback: TimeUnit): TimeUnit {
 	if (value === undefined) {
-		return 'second'
+		return fallback
 	}
 	if (value === 'second' || value === 'millisecond') {
 		return value
@@ -189,9 +206,9 @@ function readUnit(value: unknown): TimeUnit {
 	)
 }
 
-function readAlphabet(value: unknown): string {
+function readAlphabet(value: unknown, fallback: string): string {
 	if (value === undefined) {
-		return ALPHABETS.bech32
+		return fallback
 	}
 	if (typeof value !== 'string') {
 		throw new TypeError(
