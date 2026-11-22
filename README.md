@@ -1,6 +1,6 @@
 # Unique ID Generator
 
-Generate unique IDs in Obsidian, from short 7-character IDs to 128-bit ones: base36, Sqids, NanoID, UUID v4/v7, ULID and TypeID.
+Generate unique IDs in [Obsidian](https://obsidian.md/), from short 7-character IDs to 128-bit ones: base36, Sqids, NanoID, UUID v4/v7, ULID and TypeID.
 
 - Insert an ID at the cursor or copy it to the clipboard with a command.
 - Choose the default format with a guide that compares length, what the ID is based on, and ordering.
