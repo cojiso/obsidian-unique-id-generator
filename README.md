@@ -7,7 +7,7 @@ Generate unique IDs in Obsidian, from short 7-character IDs to 128-bit ones: bas
 - Call any format from Templater or your own scripts, with its own options.
 - Works on desktop and mobile, and makes no network requests.
 
-![The Default ID format modal, with Long, Time, Time-ordered and ULID selected, an example ID and the equivalent api.ulid() call](images/modal.webp)
+<img src="images/modal.webp" width="560" alt="The Default ID format modal, with Long, Time, Time-ordered and ULID selected, an example ID and the equivalent api.ulid() call">
 
 ## Commands
 
@@ -22,7 +22,7 @@ No hotkeys are set by default. To assign them, search for Unique ID Generator in
 
 **Default ID format** sets the format that the commands and `api.generate()` use. The default is Sqids. The settings tab shows the call that gives the same result and an example ID.
 
-![The Default ID format setting, with the api.sqids() call and an example ID](images/settings.webp)
+<img src="images/settings.webp" width="611" alt="The Default ID format setting, with the api.sqids() call and an example ID">
 
 To choose another format, select **Change...**:
 
