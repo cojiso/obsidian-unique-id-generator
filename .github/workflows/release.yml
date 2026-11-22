@@ -3,7 +3,7 @@ name: Release Obsidian plugin
 on:
     push:
         tags:
-            - "*"
+            - "[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
     build:
@@ -17,9 +17,21 @@ jobs:
 
             - uses: oven-sh/setup-bun@v2
 
+            # Obsidian downloads the release whose tag equals the version in manifest.json.
+            - name: Check the tag matches manifest.json
+              run: |
+                  tag="${GITHUB_REF#refs/tags/}"
+                  version="$(jq -r .version manifest.json)"
+                  if [ "$tag" != "$version" ]; then
+                    echo "Tag $tag does not match manifest.json version $version" >&2
+                    exit 1
+                  fi
+
             - name: Build plugin
               run: |
                   bun install --frozen-lockfile
+                  bun run check
+                  bun run test
                   bun run build
 
             - name: Check for optional styles
