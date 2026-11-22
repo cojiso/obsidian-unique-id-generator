@@ -3,6 +3,7 @@ import {
 	existsSync,
 	mkdirSync,
 	readFileSync,
+	watch,
 	writeFileSync,
 } from 'node:fs'
 import { builtinModules } from 'node:module'
@@ -25,8 +26,12 @@ const pluginDir = `${vaultConfigDir}/plugins/unique-id-generator`
 if (!prod) {
 	mkdirSync(pluginDir, { recursive: true })
 	copyFileSync('manifest.json', `${pluginDir}/manifest.json`)
+	// styles.css は main.ts から読み込まないので esbuild の監視に入らない。直すたびにコピーして Hot Reload に拾わせる。
 	if (existsSync('styles.css')) {
-		copyFileSync('styles.css', `${pluginDir}/styles.css`)
+		const copyStyles = () =>
+			copyFileSync('styles.css', `${pluginDir}/styles.css`)
+		copyStyles()
+		watch('styles.css', copyStyles)
 	}
 	// Hot Reload は .hotreload のあるプラグインを、main.js が変わるたびに読み込み直す。
 	writeFileSync(`${pluginDir}/.hotreload`, '')
