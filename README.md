@@ -5,7 +5,7 @@ Generate unique IDs in Obsidian, from short 7-character IDs to 128-bit ones: bas
 - Insert an ID at the cursor or copy it to the clipboard with a command.
 - Choose the default format with a guide that compares length, what the ID is based on, and ordering.
 - Call any format from Templater or your own scripts, with its own options.
-- Works on desktop and mobile, and makes no network requests.
+- Works on desktop and mobile, makes no network requests, and never reads the clipboard.
 
 <img src="images/modal.webp" width="560" alt="The Default ID format modal, with Long, Time, Time-ordered and ULID selected, an example ID and the equivalent api.ulid() call">
 
