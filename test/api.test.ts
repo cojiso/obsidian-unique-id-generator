@@ -177,6 +177,32 @@ describe('errors', () => {
 		)
 	})
 
+	test('caps size and minLength', () => {
+		expect(api.nanoid({ size: 1024 })).toHaveLength(1024)
+		expect(() => api.nanoid({ size: 1025 })).toThrow(RangeError)
+		expect(() => api.sqids({ minLength: 256 })).toThrow(RangeError)
+	})
+
+	test('reports a wrong type as a TypeError', () => {
+		expect(() => api.nanoid({ size: '12' as never })).toThrow(TypeError)
+	})
+
+	test('keeps the message for values JSON cannot show', () => {
+		expect(() => api.nanoid({ size: 10n as never })).toThrow(
+			/size must be a number: bigint/,
+		)
+		const cyclic: Record<string, unknown> = {}
+		cyclic.self = cyclic
+		expect(() => api.base36({ unit: cyclic as never })).toThrow(
+			/unit must be 'second' or 'millisecond': object/,
+		)
+	})
+
+	test('rejects arguments from callbacks such as map', () => {
+		expect(() => [1, 2].map(api.ulid)).toThrow(TypeError)
+		expect(Array.from({ length: 2 }, () => api.ulid())).toHaveLength(2)
+	})
+
 	test('rejects a bad TypeID prefix in the settings', () => {
 		const { api } = setup({ format: 'typeid', typeidPrefix: 'TSK-' })
 		expect(() => api.generate()).toThrow(

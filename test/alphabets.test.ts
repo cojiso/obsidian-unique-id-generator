@@ -20,3 +20,17 @@ test('rejects alphabets that are too short or repeat a character', () => {
 	expect(() => checkAlphabet('a')).toThrow(RangeError)
 	expect(() => checkAlphabet('abca')).toThrow(RangeError)
 })
+
+test('rejects more than 256 characters, which NanoID cannot use', () => {
+	const chars = (n: number) =>
+		Array.from({ length: n }, (_, i) =>
+			String.fromCharCode(0x100 + i),
+		).join('')
+	expect(checkAlphabet(chars(256))).toHaveLength(256)
+	expect(() => checkAlphabet(chars(257))).toThrow(RangeError)
+})
+
+test('rejects characters made of two UTF-16 code units', () => {
+	expect(() => checkAlphabet('😀😁')).toThrow(RangeError)
+	expect(() => checkAlphabet('ab😀')).toThrow(RangeError)
+})

@@ -42,15 +42,16 @@ export interface TypeidOptions {
 	prefix?: string
 }
 
+// Declared as function properties, not methods: none of them uses this, so they can be passed around on their own.
 export interface UniqueIdApi {
-	generate(): string
-	base36(options?: Base36Options): string
-	sqids(options?: SqidsOptions): string
-	nanoid(options?: NanoidOptions): string
-	uuidv4(): string
-	uuidv7(): string
-	ulid(): string
-	typeid(options?: TypeidOptions): string
+	readonly generate: () => string
+	readonly base36: (options?: Base36Options) => string
+	readonly sqids: (options?: SqidsOptions) => string
+	readonly nanoid: (options?: NanoidOptions) => string
+	readonly uuidv4: () => string
+	readonly uuidv7: () => string
+	readonly ulid: () => string
+	readonly typeid: (options?: TypeidOptions) => string
 	readonly alphabets: typeof ALPHABETS
 }
 
@@ -65,6 +66,11 @@ export const DEFAULTS = Object.freeze({
 	nanoid: Object.freeze({ alphabet: ALPHABETS.bech32, size: 16 }),
 	typeid: Object.freeze({ prefix: '' }),
 } as const)
+
+// Sqids accepts a minimum length of 0 to 255.
+const MAX_MIN_LENGTH = 255
+// NanoID IDs are usually 21 characters or fewer. The cap keeps a mistyped size from freezing Obsidian while it builds a huge string.
+const MAX_SIZE = 1024
 
 // Width to zero-pad to. Seconds fit in 7 digits until 4453-04-05, and milliseconds fit in 9 digits until 5188-04-22.
 const BASE36_WIDTH: Record<TimeUnit, number> = { second: 7, millisecond: 9 }
@@ -86,7 +92,13 @@ export function createApi(
 		const d = DEFAULTS.sqids
 		return encodeSqids([clock.next(readUnit(o.unit, d.unit))], {
 			alphabet: readAlphabet(o.alphabet, d.alphabet),
-			minLength: readInteger('minLength', o.minLength, d.minLength, 0),
+			minLength: readInteger(
+				'minLength',
+				o.minLength,
+				d.minLength,
+				0,
+				MAX_MIN_LENGTH,
+			),
 		})
 	}
 
@@ -95,7 +107,7 @@ export function createApi(
 		const d = DEFAULTS.nanoid
 		return nanoid(
 			readAlphabet(o.alphabet, d.alphabet),
-			readInteger('size', o.size, d.size, 1),
+			readInteger('size', o.size, d.size, 1, MAX_SIZE),
 		)
 	}
 
@@ -223,17 +235,17 @@ function readInteger(
 	value: unknown,
 	fallback: number,
 	min: number,
+	max: number,
 ): number {
 	if (value === undefined) {
 		return fallback
 	}
-	if (
-		typeof value !== 'number' ||
-		!Number.isSafeInteger(value) ||
-		value < min
-	) {
+	if (typeof value !== 'number') {
+		throw new TypeError(`${name} must be a number: ${show(value)}`)
+	}
+	if (!Number.isSafeInteger(value) || value < min || value > max) {
 		throw new RangeError(
-			`${name} must be an integer of ${min} or more: ${show(value)}`,
+			`${name} must be an integer from ${min} to ${max}: ${show(value)}`,
 		)
 	}
 	return value
@@ -251,5 +263,10 @@ function readString(name: string, value: unknown, fallback: string): string {
 
 // Shows the passed value in error messages, without turning objects into [object Object].
 function show(value: unknown): string {
-	return JSON.stringify(value) ?? typeof value
+	// JSON.stringify throws for a BigInt or a cyclic object, which would replace the message being built.
+	try {
+		return JSON.stringify(value) ?? typeof value
+	} catch {
+		return typeof value
+	}
 }
