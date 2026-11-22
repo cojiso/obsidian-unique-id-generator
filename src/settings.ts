@@ -10,6 +10,9 @@ import { FormatModal } from './format-modal'
 import type UniqueIdGeneratorPlugin from './main'
 import { example, renderCall } from './ui'
 
+const README_SCRIPTS_URL =
+	'https://github.com/cojiso/obsidian-unique-id-generator#use-in-scripts'
+
 export class UniqueIdGeneratorSettingTab extends PluginSettingTab {
 	plugin: UniqueIdGeneratorPlugin
 
@@ -37,7 +40,18 @@ export class UniqueIdGeneratorSettingTab extends PluginSettingTab {
 					const component = new Component()
 					component.load()
 					setting.settingEl.addClass('unique-id-generator-wrap-row')
-					setting.setDesc('Used by the commands and api.generate().')
+					// 使い方の詳しい説明は書き込まず、README へリンクする（Style guide の「背景が要るなら、説明からドキュメントへリンクする」）。
+					setting.setDesc(
+						createFragment((f) => {
+							f.appendText(
+								'Used by the commands and api.generate(). ',
+							)
+							f.createEl('a', {
+								text: 'Learn more',
+								href: README_SCRIPTS_URL,
+							})
+						}),
+					)
 					// 右上は Change... だけにする。例の ID を Change... の隣に置くと、Change... がその ID を変えるボタンに見えるので、
 					// 例の ID とすぐ隣の作り直すボタンは、コードブロックの下の右に置く（呼び出しと、その結果の並び）。
 					setting.addButton((b) =>
