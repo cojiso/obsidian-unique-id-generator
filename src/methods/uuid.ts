@@ -22,6 +22,23 @@ export function isTypeIdPrefix(prefix: string): boolean {
 	return TYPEID_PREFIX.test(prefix)
 }
 
+export type TypeIdPrefixIssue = 'characters' | 'length' | 'edges'
+
+// prefix がどの決まりから外れているか。設定画面で、外れた決まりだけをエラーに出すために使う。空なら何も外れていない。
+export function typeIdPrefixIssues(prefix: string): TypeIdPrefixIssue[] {
+	const issues: TypeIdPrefixIssue[] = []
+	if (!/^[a-z_]*$/.test(prefix)) {
+		issues.push('characters')
+	}
+	if (prefix.length > 63) {
+		issues.push('length')
+	}
+	if (prefix.startsWith('_') || prefix.endsWith('_')) {
+		issues.push('edges')
+	}
+	return issues
+}
+
 // TypeID の後半26文字は、ULID を小文字にしたものと同じ。接頭辞が空なら区切りの _ も付けない。
 export function toTypeID(prefix: string, uuid: string): string {
 	if (!isTypeIdPrefix(prefix)) {

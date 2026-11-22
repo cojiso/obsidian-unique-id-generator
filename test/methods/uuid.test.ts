@@ -4,6 +4,7 @@ import {
 	isTypeIdPrefix,
 	toTypeID,
 	toULID,
+	typeIdPrefixIssues,
 	uuidV4,
 	uuidV7,
 } from '../../src/methods/uuid'
@@ -70,4 +71,41 @@ describe('TypeID spec invalid.yml prefixes', () => {
 
 test('omits the separator when the prefix is empty', () => {
 	expect(toTypeID('', uuidV7())).toMatch(/^[0-7][0-9a-hjkmnp-tv-z]{25}$/)
+})
+
+describe('typeIdPrefixIssues', () => {
+	test('names each rule the prefix breaks', () => {
+		expect(typeIdPrefixIssues('task')).toEqual([])
+		expect(typeIdPrefixIssues('')).toEqual([])
+		expect(typeIdPrefixIssues('Task')).toEqual(['characters'])
+		expect(typeIdPrefixIssues('a'.repeat(64))).toEqual(['length'])
+		expect(typeIdPrefixIssues('task_')).toEqual(['edges'])
+		expect(typeIdPrefixIssues('_Task-')).toEqual(['characters', 'edges'])
+		expect(typeIdPrefixIssues(`_${'a'.repeat(63)}`)).toEqual([
+			'length',
+			'edges',
+		])
+	})
+
+	test('agrees with isTypeIdPrefix on the spec cases and more', () => {
+		const prefixes = [
+			...valid.map((c) => c.prefix),
+			...invalid.map((c) =>
+				c.typeid.slice(0, Math.max(0, c.typeid.lastIndexOf('_'))),
+			),
+			'a',
+			'a_b',
+			'_',
+			'__',
+			'a'.repeat(63),
+			'a'.repeat(64),
+			'task-type',
+			'tâsk',
+		]
+		for (const prefix of prefixes) {
+			expect(typeIdPrefixIssues(prefix).length === 0).toBe(
+				isTypeIdPrefix(prefix),
+			)
+		}
+	})
 })
