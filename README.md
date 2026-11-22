@@ -146,11 +146,7 @@ Because the plugin adds 1 for each extra ID made in the same second, the decoded
 
 Requires Obsidian 1.13.1 or later.
 
-Once the plugin is listed in the community directory:
-
-1. Open **Settings → Community plugins**, and turn off restricted mode if it is on.
-2. Select **Browse** and search for Unique ID Generator.
-3. Install and enable it.
+From the community directory: open [Unique ID Generator](https://community.obsidian.md/plugins/unique-id-generator), or search for it in **Settings → Community plugins → Browse**, then install and enable it. If restricted mode is on, turn it off first.
 
 Manually:
 
