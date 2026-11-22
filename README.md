@@ -7,6 +7,31 @@ Generate unique IDs in Obsidian, from short 7-character IDs to 128-bit ones: bas
 - Call any format from Templater or your own scripts, with its own options.
 - Works on desktop and mobile, and makes no network requests.
 
+![The Default ID format modal, with Long, Time, Time-ordered and ULID selected, an example ID and the equivalent api.ulid() call](images/modal.webp)
+
+## Commands
+
+| Command              | What it does                                                                   |
+| -------------------- | ------------------------------------------------------------------------------ |
+| Copy ID to clipboard | Copies a new ID in the default format.                                         |
+| Insert ID            | Inserts a new ID in the default format at the cursor, replacing any selection. |
+
+No hotkeys are set by default. To assign them, search for Unique ID Generator in **Settings → Hotkeys**.
+
+## Settings
+
+**Default ID format** sets the format that the commands and `api.generate()` use. The default is Sqids. The settings tab shows the call that gives the same result and an example ID.
+
+![The Default ID format setting, with the api.sqids() call and an example ID](images/settings.webp)
+
+To choose another format, select **Change...**:
+
+- Choose by length, what the ID is based on, and ordering. [Formats](#formats) compares them. For long time-based IDs, also choose the encoding: UUID, ULID or TypeID. For TypeID, enter the type prefix.
+- Or pick a format by name from the list next to **Save**.
+- The example ID and the equivalent call update as you choose. Select ↻ for another example.
+
+Nothing is saved until you select **Save**.
+
 ## Formats
 
 | Format  | Example                                | Characters         | Based on            | Ordering     | Uniqueness          |
@@ -36,27 +61,6 @@ UUID v7, ULID and TypeID hold the same 128 bits in different encodings: hexadeci
 
 > [!NOTE]
 > **Time-based IDs reveal when they were made.** base36, Sqids, UUID v7, ULID and TypeID can all be decoded back to the time they were created. Sqids only looks scrambled; it is not encryption. If the creation time must stay private, use NanoID or UUID v4. See [Decoding the time](#decoding-the-time).
-
-## Commands
-
-| Command              | What it does                                                                   |
-| -------------------- | ------------------------------------------------------------------------------ |
-| Copy ID to clipboard | Copies a new ID in the default format.                                         |
-| Insert ID            | Inserts a new ID in the default format at the cursor, replacing any selection. |
-
-No hotkeys are set by default. To assign them, search for Unique ID Generator in **Settings → Hotkeys**.
-
-## Settings
-
-**Default ID format** sets the format that the commands and `api.generate()` use. The default is Sqids. The settings tab shows the call that gives the same result and an example ID.
-
-To choose another format, select **Change...**:
-
-- Choose by length, what the ID is based on, and ordering. For long time-based IDs, also choose the encoding: UUID, ULID or TypeID. For TypeID, enter the type prefix.
-- Or pick a format by name from the list next to **Save**.
-- The example ID and the equivalent call update as you choose. Select ↻ for another example.
-
-Nothing is saved until you select **Save**.
 
 ## Use in scripts
 
